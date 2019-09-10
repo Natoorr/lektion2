@@ -42,7 +42,8 @@ public class l‰xavecka37 {
 		String telefon = input.nextLine();
 		
 		
-		System.out.println("Information\nNamn:\t" + namn + "\n≈lder:\t" + age + "\nAdress:\t" + adress + "\n" + postnummer + "  " + stad + "\nTelefonnummer:" + telefon);
+		System.out.println("Information\nNamn:\t" + namn + "\n≈lder:\t" + age + "\nAdress:\t" + adress + "\n" + postnummer + "  "
+		+ stad + "\nTelefonnummer:" + telefon);
 		
 
 	}
