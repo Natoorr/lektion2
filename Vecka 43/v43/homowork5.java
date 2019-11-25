@@ -68,6 +68,7 @@ public class homowork5 {
 	}
 
 	public static double kelvin(double celcius) {
+		double celcius = (fahrenheit - 32) / 1.8;
 		double kelvin = 273.15;
 		kelvin += celcius;
 		return kelvin;
