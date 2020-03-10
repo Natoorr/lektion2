@@ -11,7 +11,7 @@ public class guessNumber {
 		boolean done = true; // gör en boolean som ska repeata spelet
 		while (done) { // repeatarå länge nån vill spela spelet
 			System.out.println(
-					"Skriv in numret för den svårigheten du vill har\n1 - Easy (20 tries)\n2 - Medium (10 tries)\n3 - Hard (5 tries)");
+					"Välkommen till Guess The Number!\nSkriv in numret för den svårigheten du vill har\n1 - Easy (20 tries)\n2 - Medium (10 tries)\n3 - Hard (5 tries)");
 
 			try { // en try-catch ifall att man är efterbliven och svarar B
 				difficulty = input.nextInt(); // tar in en int som bestämmer svårighetsgrad
