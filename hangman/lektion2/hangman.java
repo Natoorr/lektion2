@@ -3,137 +3,322 @@ package lektion2;
 import java.util.Scanner;
 
 public class hangman {
+
 	public static void main(String[] args) {
+		boolean done = false;
+		int randomNumber = 0;
+
+		String[] wordArray = { "Banana", "Skateboard", "Orange", "Fruit", "Baseball", "Computer", "Order", "Underwear",
+				"Sanitizer", "Plant", "Water", "Seagull", "Hamburger" };
+
+		System.out.println("Welcome to hangman!\n");
+
+		while (!done) {
+
+			randomNumber = randomNumber(wordArray.length); // Generates a random number
+
+			String theWord = wordArray[randomNumber]; // Gets the word at [randomNumber]
+
+			theWord = selectGameType(theWord); // asks if the player wants to change the word or not
+
+			guessWord(theWord, selectGameLevel()); // The entire game
+
+			done = playAgain(); // can set {done} to true or false
+		}
+	}
+
+	/**
+	 * Brings in the word and asks the user if they want to replace it with their
+	 * own word
+	 * 
+	 * @param word
+	 * @return
+	 */
+	public static String selectGameType(String word) {
 		Scanner input = new Scanner(System.in);
-		int difficulty;
-		boolean done = true;
-		String[] words = { "Banana", "Skateboard", "Orange", "Fruit", "Baseball", "Computer",
-				"Three hundred and seventy five million eight hundred and ninety four thousand six hundred and fourty two",
-				"Order", "Underwear", "Sanitizer", "Plant", "Water", "Seagull", "Hamburger" };
-		int max = words.length;
-		int wordInt = 0;
-		while (done) {
-			System.out.println(
-					"Welcome to hangman!\nWrite a number based on what difficulty you would like!\n1 - Easy (15 tries)\n2 - Medium (10 tries)\n3 - Hard (5 tries)");
-			wordInt = randomNumber(max);
+
+		boolean done = false;
+		int choice;
+
+		while (!done) {
+
 			try {
-				difficulty = input.nextInt();
-				switch (difficulty) {
+				System.out.println("Do you want us to generate a word for you or do you want to create one yourself?"
+						+ "\n1 - We make it for your\n2 - Create one yourself (2 player)\n");
+				System.out.print(">");
+
+				choice = input.nextInt();
+				System.out.println();
+
+				switch (choice) { // if the user answers 1 it keeps the word
+									// and if they answer 2, makes them type one in
+
 				case 1:
-					System.out.println("You have selected easy.");
-					if (hangingman(words[wordInt], 15) == 2) {
-						System.exit(0);
-					} else {
-						break;
-					}
-
+					System.out.println("Understood, we will generate a word for you");
+					done = true;
+					break;
 				case 2:
-					System.out.println("You have selected medium.");
-					if (hangingman(words[wordInt], 10) == 2) {
-						System.exit(0);
-					} else {
-						break;
-					}
+					System.out.println(
+							"Write any word you would like! (Can contain special characters but no blank spaces)");
+					System.out.print(">");
 
-				case 3:
-					System.out.println("You have selected hard.");
-					if (hangingman(words[wordInt], 5) == 2) {
-						System.exit(0);
-					} else {
-						break;
-					}
+					word = input.next();
+					done = true;
+					break;
+
 				default:
-					System.out.println("Write a number from 1 to 3");
+					System.out.println("Write a number between one and two");
 					break;
 				}
 			} catch (Exception e) {
-				System.out.println("Write a number from 1 to 3");
+				System.out.println("Write a number between one and two");
 				input.nextLine();
-
 			}
-
 		}
+		return word; // returns the word, will be the same if the user doesn't change it
 	}
 
-	public static int hangingman(String word, int lives) {
+	/**
+	 * Gets the amount of guesses that the user will have in the game
+	 * 
+	 * @return
+	 */
+	public static int selectGameLevel() {
 		Scanner input = new Scanner(System.in);
-		System.out.println(
-				"Vill du välja ett förbestämt ord eller skriva in ett ord själv?\n1 - Förutbestämt ord\n2 - Skriva Själv");
-		int choose = input.nextInt();
-		if (choose == 1) {
-			System.out.println("Uppfattat! Vi genererar ett ord åt dig.");
-		} else if (choose == 2) {
-			System.out.println("Skriv in ordet du vill välja. Det får innehålla mellanslag och specialtecken.");
-			word = input.nextLine();
+		int gameLevel = 0;
+		int choice;
+
+		System.out.println("How many guesses would you like to have?\n1 - 15 guesses\n2 - 10 guesses\n3 - 5 guesses\n");
+		System.out.print(">");
+		try {
+			choice = input.nextInt();
+
+			switch (choice) {
+
+			case 1:
+				gameLevel = 15;
+				break;
+
+			case 2:
+				gameLevel = 10;
+				break;
+
+			case 3:
+				gameLevel = 5;
+				break;
+
+			default:
+				System.out.println("Write a number between one and three");
+				break;
+			}
+		} catch (Exception e) {
+			System.out.println("Write a number between one and three");
+			input.nextLine();
 		}
 
-		String word1 = word.toUpperCase();
-		char[] word2 = word1.toCharArray();
-		
+		return gameLevel;
+	}
 
-		char[] guessingWord = new char[word1.length()];
-		for (int i = 0; i < word1.length(); i++) {
-			if (word2[i] == ' ') {
-				guessingWord[i] = word2[i];
+	/**
+	 * Gets a word and an amount of guesses and makes the user guess what the word
+	 * is.
+	 * 
+	 * @param theWord
+	 * @param guesses
+	 * @return
+	 */
+	public static void guessWord(String theWord, int guesses) {
+		Scanner input = new Scanner(System.in);
+
+		char[] secretWord = theWord.toUpperCase().toCharArray();
+		// ^ creates a chararray out of a word in wordArray and makes it all upper case
+		char[] guessingWord = new char[secretWord.length];
+		// ^ creates a chararray with the same length as secretWord
+
+		char guess;
+		boolean guessingDone = false;
+		boolean correctCheck;
+		int lettersLeft;
+
+		for (int i = 0; i < secretWord.length; i++) {
+			if (secretWord[i] == ' ') {
+				guessingWord[i] = ' ';
 			} else {
 				guessingWord[i] = '*';
 			}
-		}
-		System.out.println("Guess the word, you have " + lives
-				+ " lives. If multiple characters are inputted, only the first one will be accounted for. (For now)");
+		} // makes guessingWord an exact copy of secretWord, but replacing all the letters
+			// with stars
 
-		char guess;
-		boolean loop = true;
-		int correct;
-		int end;
-		while (loop) {
-			System.out.println(guessingWord);
+		System.out.println("\nGuess the word, you have " + guesses
+				+ " lives. If multiple characters are entered, only the first one will be used. (For now)");
+
+		while (!guessingDone) {
+
+			System.out.println("Word progress: " + new String(guessingWord));
+			// New string makes whatever is in the () into a String
+
+			System.out.print(">"); // All of these are for easily being able to see where to type
+
 			guess = input.next().toUpperCase().charAt(0);
-			correct = 0;
-			end = 0;
+
+			correctCheck = false; // resets variables that can finish the game
+			lettersLeft = 0;
 
 			for (int i = 0; i < guessingWord.length; i++) {
-				if (word2[i] == guess) {
+				if (secretWord[i] == guess) {
 					guessingWord[i] = guess;
-					correct++;
+					correctCheck = true;
 				}
-			}
+			} // if any part secretWord is equal to the users guess, makes guessingWord at
+				// that spot become equal to guess
+				// correctCheck is used later to determine wether or not to remove a life
+
 			for (int i = 0; i < guessingWord.length; i++) {
 				if (guessingWord[i] == '*') {
-					end++;
+					lettersLeft++;
 					break;
 				}
-			}
-			if (end == 0) {
-				System.out.println("Congratulations! You found the word and was left with " + lives
-						+ " lives! The word was " + word + "!");
-				loop = false;
-			}
-			
-			if (end != 0) {
+			} // checks if there are any letters left to be guessed
 
-				if (correct <= 0) {
-					lives--;
-					System.out.println("That letter was not a part of the word, you have " + lives + " lives left!");
+			if (lettersLeft == 0) { // ends the game if the user finds the word
+				System.out.println("\nCongratulations! You found the word and was left with " + guesses
+						+ " lives! The word was " + theWord.toUpperCase() + "!");
+				guessingDone = true;
+
+			} else {
+
+				if (!correctCheck) { // used correctCheck to determine wether or not to remove a life
+					guesses--;
+					System.out.println("That letter was not a part of the word, you have " + guesses + " lives left!");
 				} else {
 					System.out.println("You found a part of the word!");
 				}
-				if (lives == 0) {
-					System.out.println("You lose! The word was " + word + "!");
-					loop = false;
+
+				if (!correctCheck) { // if you are incorrect, makes a hanged man
+					switch (guesses) {
+					case 1:
+						System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + " /|\\  |\r\n"
+								+ " /    |\r\n" + "      |\r\n" + "========= ");
+						break;
+					case 2:
+						System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + " /|\\  |\r\n"
+								+ "      |\r\n" + "      |\r\n" + "========= ");
+						break;
+					case 3:
+						System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + " /|   |\r\n" + "      |\r\n"
+								+ "      |\r\n" + "========= ");
+						break;
+					case 4:
+						System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + "  |   |\r\n" + "      |\r\n"
+								+ "      |\r\n" + "========= ");
+						break;
+					case 5:
+						System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + "      |\r\n" + "      |\r\n"
+								+ "      |\r\n" + "========= ");
+						break;
+					case 6:
+						System.out.println("  +---+\r\n" + "  |   |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
+								+ "      |\r\n" + "========= ");
+						break;
+					case 7:
+						System.out.println("  +---+\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
+								+ "      |\r\n" + "========= ");
+						break;
+					case 8:
+						System.out.println("   ---+\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
+								+ "      |\r\n" + "========= ");
+						break;
+					case 9:
+						System.out.println("    --+\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
+								+ "      |\r\n" + "========= ");
+						break;
+					case 10:
+						System.out.println("     -+\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
+								+ "      |\r\n" + "========= ");
+						break;
+					case 11:
+						System.out.println("      +\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
+								+ "      |\r\n" + "========= ");
+						break;
+					case 12:
+						System.out.println("       \r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
+								+ "      |\r\n" + "========= ");
+						break;
+					case 13:
+						System.out.println("     \r\n" + "      \r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
+								+ "      |\r\n" + "========= ");
+						break;
+					case 14:
+						System.out.println("     \r\n" + "      \r\n" + "      \r\n" + "      |\r\n" + "      |\r\n"
+								+ "      |\r\n" + "=========");
+						break;
+					default:
+
+						break;
+					}
+				}
+				if (guesses == 0) { // checks wether or not to end the game based on guesses left, types out a
+									// finished hanged man
+					System.out.println("You lose! The word was " + theWord.toUpperCase(), FColor.YELLOW + "!");
+					guessingDone = true;
+					System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + " /|\\  |\r\n" + " / \\  |\r\n"
+							+ "      |\r\n" + "========= ");
 				}
 
 			}
 		}
-
-		System.out.println("Would you like to play again?\n1 - Yes\n2 - No");
-		int playAgain = 0;
-		playAgain = input.nextInt();
-		return playAgain;
 	}
 
+	/**
+	 * Asks the user if they would like to go again
+	 * 
+	 * @return
+	 */
+	public static boolean playAgain() {
+		Scanner input = new Scanner(System.in);
+		int choice;
+		boolean again = true;
+		boolean done = false;
+
+		while (!done) {
+			try {
+				System.out.println("Would you like to play again?\n1 - Yes\n2 - No\n");
+				System.out.print(">");
+				choice = input.nextInt();
+				System.out.println();
+
+				switch (choice) { // if choice is 1 or 2 makes the program run again or not
+				case 1:
+					again = false;
+					done = true;
+					break;
+				case 2:
+					again = true;
+					done = true;
+					break;
+				default:
+					System.out.println("Please write a number between one and two");
+					break;
+				}
+			} catch (Exception e) {
+				System.out.println("Please write a number between one and two");
+				input.nextLine();
+			}
+		}
+
+		return again; // {again} becomes {done} in the main method which makes the whole program run
+						// again/not
+	}
+
+	/**
+	 * generates a random whole number between 0 and the one sent in
+	 * 
+	 * @param max
+	 * @return
+	 */
 	public static int randomNumber(int max) {
-		int number = (int) (Math.random() * max);
+		int number = (int) (Math.random() * max); // generates a random number between 0 and max (aka
+													// wordArray.length())
 		return number;
 	}
 }
