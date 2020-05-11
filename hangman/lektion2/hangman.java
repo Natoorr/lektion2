@@ -9,7 +9,7 @@ public class hangman {
 		int randomNumber = 0;
 
 		String[] wordArray = { "Banana", "Skateboard", "Orange", "Fruit", "Baseball", "Computer", "Order", "Underwear",
-				"Sanitizer", "Plant", "Water", "Seagull", "Hamburger" };
+				"Sanitizer", "Plant", "Water", "Seagull", "Hamburger", "Store Manager", "Spin-off"};
 
 		System.out.println("Welcome to hangman!\n");
 
@@ -48,6 +48,7 @@ public class hangman {
 				System.out.print(">");
 
 				choice = input.nextInt();
+				input.nextLine();
 				System.out.println();
 
 				switch (choice) { // if the user answers 1 it keeps the word
@@ -59,10 +60,9 @@ public class hangman {
 					break;
 				case 2:
 					System.out.println(
-							"Write any word you would like! (Can contain special characters but no blank spaces)");
+							"Write any word you would like! (Can contain special characters and blank spaces)");
 					System.out.print(">");
-
-					word = input.next();
+					word = input.nextLine();
 					done = true;
 					break;
 
@@ -135,7 +135,8 @@ public class hangman {
 		char[] guessingWord = new char[secretWord.length];
 		// ^ creates a chararray with the same length as secretWord
 
-		char guess;
+		String guessString;
+		char guessChar;
 		boolean guessingDone = false;
 		boolean correctCheck;
 		int lettersLeft;
@@ -150,7 +151,7 @@ public class hangman {
 			// with stars
 
 		System.out.println("\nGuess the word, you have " + guesses
-				+ " lives. If multiple characters are entered, only the first one will be used. (For now)");
+				+ " lives. If multiple characters are entered, if will be counted as trying to guess the entire word.");
 
 		while (!guessingDone) {
 
@@ -159,113 +160,134 @@ public class hangman {
 
 			System.out.print(">"); // All of these are for easily being able to see where to type
 
-			guess = input.next().toUpperCase().charAt(0);
+			guessString = input.nextLine().toUpperCase();
 
 			correctCheck = false; // resets variables that can finish the game
 			lettersLeft = 0;
 
-			for (int i = 0; i < guessingWord.length; i++) {
-				if (secretWord[i] == guess) {
-					guessingWord[i] = guess;
+			if (guessString.length() != 1) { // If the guess if longer than one character the code will see if it
+												// matches the word and choose to deduct lives based on that
+				if (guessString.equals(theWord.toUpperCase())) {
+					System.out.println("\nCongratulations! You found the word and was left with " + guesses
+							+ " lives! The word was " + theWord.toUpperCase() + "!");
 					correctCheck = true;
-				}
-			} // if any part secretWord is equal to the users guess, makes guessingWord at
-				// that spot become equal to guess
-				// correctCheck is used later to determine wether or not to remove a life
+					guessingDone = true;
 
-			for (int i = 0; i < guessingWord.length; i++) {
-				if (guessingWord[i] == '*') {
-					lettersLeft++;
-					break;
+				} else {
+					guesses--;
+					System.out.println(
+							"That was not the word, you lose one life. You now have " + guesses + " lives left!");
 				}
-			} // checks if there are any letters left to be guessed
-
-			if (lettersLeft == 0) { // ends the game if the user finds the word
-				System.out.println("\nCongratulations! You found the word and was left with " + guesses
-						+ " lives! The word was " + theWord.toUpperCase() + "!");
-				guessingDone = true;
 
 			} else {
 
-				if (!correctCheck) { // used correctCheck to determine wether or not to remove a life
-					guesses--;
-					System.out.println("That letter was not a part of the word, you have " + guesses + " lives left!");
-				} else {
-					System.out.println("You found a part of the word!");
-				}
+				guessChar = guessString.charAt(0); // converts the string to a char
 
-				if (!correctCheck) { // if you are incorrect, makes a hanged man
-					switch (guesses) {
-					case 1:
-						System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + " /|\\  |\r\n"
-								+ " /    |\r\n" + "      |\r\n" + "========= ");
-						break;
-					case 2:
-						System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + " /|\\  |\r\n"
-								+ "      |\r\n" + "      |\r\n" + "========= ");
-						break;
-					case 3:
-						System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + " /|   |\r\n" + "      |\r\n"
-								+ "      |\r\n" + "========= ");
-						break;
-					case 4:
-						System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + "  |   |\r\n" + "      |\r\n"
-								+ "      |\r\n" + "========= ");
-						break;
-					case 5:
-						System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + "      |\r\n" + "      |\r\n"
-								+ "      |\r\n" + "========= ");
-						break;
-					case 6:
-						System.out.println("  +---+\r\n" + "  |   |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
-								+ "      |\r\n" + "========= ");
-						break;
-					case 7:
-						System.out.println("  +---+\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
-								+ "      |\r\n" + "========= ");
-						break;
-					case 8:
-						System.out.println("   ---+\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
-								+ "      |\r\n" + "========= ");
-						break;
-					case 9:
-						System.out.println("    --+\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
-								+ "      |\r\n" + "========= ");
-						break;
-					case 10:
-						System.out.println("     -+\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
-								+ "      |\r\n" + "========= ");
-						break;
-					case 11:
-						System.out.println("      +\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
-								+ "      |\r\n" + "========= ");
-						break;
-					case 12:
-						System.out.println("       \r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
-								+ "      |\r\n" + "========= ");
-						break;
-					case 13:
-						System.out.println("     \r\n" + "      \r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
-								+ "      |\r\n" + "========= ");
-						break;
-					case 14:
-						System.out.println("     \r\n" + "      \r\n" + "      \r\n" + "      |\r\n" + "      |\r\n"
-								+ "      |\r\n" + "=========");
-						break;
-					default:
+				for (int i = 0; i < guessingWord.length; i++) {
+					if (secretWord[i] == guessChar) {
+						guessingWord[i] = guessChar;
+						correctCheck = true;
+					}
+				} // if any part secretWord is equal to the users guess, makes guessingWord at
+					// that spot become equal to guess
+					// correctCheck is used later to determine wether or not to remove a life
 
+				for (int i = 0; i < guessingWord.length; i++) {
+					if (guessingWord[i] == '*') {
+						lettersLeft++;
 						break;
 					}
-				}
-				if (guesses == 0) { // checks wether or not to end the game based on guesses left, types out a
-									// finished hanged man
-					System.out.println("You lose! The word was " + theWord.toUpperCase(), FColor.YELLOW + "!");
+				} // checks if there are any letters left to be guessed
+
+				if (lettersLeft == 0) { // ends the game if the user finds the word
+					System.out.println("\nCongratulations! You found the word and was left with " + guesses
+							+ " lives! The word was " + theWord.toUpperCase() + "!");
 					guessingDone = true;
-					System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + " /|\\  |\r\n" + " / \\  |\r\n"
-							+ "      |\r\n" + "========= ");
+
+				} else {
+
+					if (!correctCheck) { // used correctCheck to determine wether or not to remove a life
+						guesses--;
+						System.out.println(
+								"That letter was not a part of the word, you have " + guesses + " lives left!");
+					} else {
+						System.out.println("You found a part of the word!");
+					}
 				}
 
 			}
+
+			if (!correctCheck) { // if you are incorrect, makes a hanged man
+				switch (guesses) {
+				case 1:
+					System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + " /|\\  |\r\n" + " /    |\r\n"
+							+ "      |\r\n" + "========= ");
+					break;
+				case 2:
+					System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + " /|\\  |\r\n" + "      |\r\n"
+							+ "      |\r\n" + "========= ");
+					break;
+				case 3:
+					System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + " /|   |\r\n" + "      |\r\n"
+							+ "      |\r\n" + "========= ");
+					break;
+				case 4:
+					System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + "  |   |\r\n" + "      |\r\n"
+							+ "      |\r\n" + "========= ");
+					break;
+				case 5:
+					System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + "      |\r\n" + "      |\r\n"
+							+ "      |\r\n" + "========= ");
+					break;
+				case 6:
+					System.out.println("  +---+\r\n" + "  |   |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
+							+ "      |\r\n" + "========= ");
+					break;
+				case 7:
+					System.out.println("  +---+\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
+							+ "      |\r\n" + "========= ");
+					break;
+				case 8:
+					System.out.println("   ---+\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
+							+ "      |\r\n" + "========= ");
+					break;
+				case 9:
+					System.out.println("    --+\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
+							+ "      |\r\n" + "========= ");
+					break;
+				case 10:
+					System.out.println("     -+\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
+							+ "      |\r\n" + "========= ");
+					break;
+				case 11:
+					System.out.println("      +\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
+							+ "      |\r\n" + "========= ");
+					break;
+				case 12:
+					System.out.println("       \r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
+							+ "      |\r\n" + "========= ");
+					break;
+				case 13:
+					System.out.println("     \r\n" + "      \r\n" + "      |\r\n" + "      |\r\n" + "      |\r\n"
+							+ "      |\r\n" + "========= ");
+					break;
+				case 14:
+					System.out.println("     \r\n" + "      \r\n" + "      \r\n" + "      |\r\n" + "      |\r\n"
+							+ "      |\r\n" + "=========");
+					break;
+				default:
+
+					break;
+				}
+			}
+			if (guesses == 0) { // checks wether or not to end the game based on guesses left, types out a
+								// finished hanged man
+				System.out.println("You lose! The word was " + theWord.toUpperCase() + "!");
+				guessingDone = true;
+				System.out.println("  +---+\r\n" + "  |   |\r\n" + "  O   |\r\n" + " /|\\  |\r\n" + " / \\  |\r\n"
+						+ "      |\r\n" + "========= ");
+			}
+
 		}
 	}
 
