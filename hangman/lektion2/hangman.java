@@ -53,7 +53,6 @@ public class hangman {
 
 				switch (choice) { // if the user answers 1 it keeps the word
 									// and if they answer 2, makes them type one in
-
 				case 1:
 					System.out.println("Understood, we will generate a word for you");
 					done = true;
